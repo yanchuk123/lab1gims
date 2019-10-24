@@ -12,7 +12,7 @@ public class Main {
 
     public static void noiz (int porog)throws IOException {
 
-        BufferedImage im = ImageIO.read(new File("C:\\Users\\5elementy\\IdeaProjects\\labgims\\file.jpg"));
+        BufferedImage im = ImageIO.read(new File("file.jpg"));
         int rx=0;
         int ry=0;
         int newR =0;
@@ -30,7 +30,7 @@ public class Main {
 
         }
 
-        ImageIO.write(im,"jpg",new File("C:\\Users\\5elementy\\IdeaProjects\\labgims\\file1.jpg"));
+        ImageIO.write(im,"jpg",new File("file1.jpg"));
 
 
     }
@@ -40,7 +40,7 @@ public class Main {
         int [] masR = new int[5];
         int [] masG = new int[5];
         int [] masB = new int[5];
-        BufferedImage im = ImageIO.read(new File("C:\\Users\\5elementy\\IdeaProjects\\labgims\\file1.jpg"));
+        BufferedImage im = ImageIO.read(new File("file1.jpg"));
 
 
         for (int i = 1; i <im.getHeight() -1; i++) {
@@ -77,12 +77,90 @@ public class Main {
             }
 
         }
-        ImageIO.write(im,"jpg",new File("C:\\Users\\5elementy\\IdeaProjects\\labgims\\fileFilt.jpg"));
+        ImageIO.write(im,"jpg",new File("fileFilt.jpg"));
 
     }
 
+    public static void cont (double porog) throws IOException   {
+        BufferedImage im = ImageIO.read(new File("file.jpg"));
+
+        double brightmain=0;
+        double brighttop=0;
+        double brightbot=0;
+        double brightleft=0;
+        double brightright=0;
+        double f = 0;
+        double min = 0;
+        double max = 0;
+        double [] []masf = new double[im.getHeight()][im.getWidth()];
+        Color newWhite = new Color(255,255,255);
+        Color newBlack = new Color(0,0,0);
+
+        for (int i = 1; i <im.getHeight() -1; i++) {
+            for (int j = 1; j <im.getWidth()-1; j++) {
+
+                Color colmain = new Color(im.getRGB(j,i ));
+                Color colbot = new Color(im.getRGB(j,i + 1));
+                Color colright = new Color(im.getRGB(j + 1,i ));
+                Color coltop = new Color(im.getRGB( j,i - 1));
+                Color colleft = new Color(im.getRGB( j - 1,i));
+
+
+
+
+                brightmain =  (0.3*colmain.getRed() + 0.6*colmain.getGreen() + 0.1*colmain.getBlue());
+                brighttop =  (0.3*coltop.getRed() + 0.6*coltop.getGreen() + 0.1*coltop.getBlue());
+                brightbot =  (0.3*colbot.getRed() + 0.6*colbot.getGreen() + 0.1*colbot.getBlue());
+                brightleft =  (0.3*colleft.getRed() + 0.6*colleft.getGreen() + 0.1*colleft.getBlue());
+                brightright =  (0.3*colright.getRed() + 0.6*colright.getGreen() + 0.1*colright.getBlue());
+                f = Math.log(brightmain/brightbot)+Math.log(brightmain/brighttop)+Math.log(brightmain/brightleft)+Math.log(brightmain/brightright);
+                // f = Math.log((Math.pow(brightmain,4))/(brighttop*brightbot*brightleft*brightright));
+                masf[i][j]=f;
+
+
+     //           System.out.println(+f);
+
+            }
+        }
+        for (int i = 0; i < im.getHeight(); i++) {
+            for (int j = 0; j < im.getWidth() ; j++) {
+                if (min > masf[i][j]) {
+                    min = masf[i][j];
+                }
+                if (max < masf[i][j]) {
+                    max =  masf[i][j];
+                }
+            }
+
+        }
+        for (int i = 0; i < im.getHeight(); i++) {
+            for (int j = 0; j < im.getWidth() ; j++) {
+                masf[i][j]+=Math.abs(min);
+                masf[i][j] = masf[i][j]*255/(max+Math.abs(min));
+            }
+ }
+
+        for (int i = 0; i < im.getHeight() ; i++) {
+            for (int j = 0; j < im.getWidth(); j++) {
+                if (masf[i][j] > porog) {
+                    im.setRGB(j,i,newBlack.getRGB());
+                }
+                if (masf[i][j] <= porog) {
+                    im.setRGB(j,i,newWhite.getRGB());
+
+                }
+            }
+
+        }
+        System.out.println(min+ "  "  + max);
+        ImageIO.write(im,"jpg",new File("fileCor.jpg"));
+    }
+
+
+
     public static void main(String[] args)throws IOException  {
-	noiz(15);
-	filtr();
+	//noiz(15);
+	//filtr();
+        cont(175);
     }
 }
